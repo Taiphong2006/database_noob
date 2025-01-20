@@ -2,14 +2,14 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [next.jdbc :as jdbc]))
+            [next.jdbc :as jdbc]
+            [cheshire.core :as json]
+            [ring.util.response :as response]))
 
-(defroutes app-routes
-  (GET "/" [] "Hello World")
-  (route/not-found "Not Found"))
 
-(def app
-  (wrap-defaults app-routes site-defaults))
+(defn -main
+  [& args]
+  (println "Hello, World!"))
 
 
 (def db
@@ -20,17 +20,26 @@
    :user "postgres"
    :host "127.0.0.1"})
 
+
 (def ds (jdbc/get-datasource db))
 
-(defn handle-str
-[s]
-(if (string? s)
-(str "'" s "'")
-s))
+(defn customer-data
+  [ds]
+  (jdbc/execute! ds ["select * from customer"]))
 
-(defn find_customer
-  [ds params]
-  (jdbc/execute-one! ds [(str "select * from customer where " (name (first (keys params))) " = " (handle-str (first (vals params))) " and " (name (last (keys params))) " = " (handle-str (last (vals  params))))]))
+(json/generate-string(customer-data ds))
+
+(defroutes app-routes
+  (GET "/" [] "<h1>Hello World</h1>")
+  (GET "/customers" [] (->  (customer-data ds)
+                            (json/generate-string)
+                            (response/response)
+                            (response/content-type "application/json")))
+  (route/not-found "Not Found"))
+
+(def app
+  (wrap-defaults app-routes site-defaults))
+
 
 
 
