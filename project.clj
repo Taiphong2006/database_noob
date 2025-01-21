@@ -1,4 +1,4 @@
-(defproject server-noob "0.1.0-SNAPSHOT"
+(defproject database-noob "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
@@ -12,7 +12,7 @@
                  [ring/ring-jetty-adapter "1.8.2"]
                  [javax.xml.bind/jaxb-api "2.3.1"]]
   :plugins [[lein-ring "0.12.5"]]
-  :ring {:handler server-noob.handler/app}
+  :ring {:handler database-noob.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]}})

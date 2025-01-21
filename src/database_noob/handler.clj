@@ -27,7 +27,12 @@
   [ds]
   (jdbc/execute! ds ["select * from customer"]))
 
-(json/generate-string(customer-data ds))
+(defn customer-id
+  [ds params]
+  (jdbc/execute! ds [(str "select * from customer where customer_id ="  params)]))
+(customer-id ds 2)
+
+(json/generate-string (customer-data ds))
 
 (defroutes app-routes
   (GET "/" [] "<h1>Hello World</h1>")
@@ -35,7 +40,14 @@
                             (json/generate-string)
                             (response/response)
                             (response/content-type "application/json")))
+  (GET "/customers/:id" [id] (->  (customer-id ds id)
+                                  (json/generate-string)
+                                  (response/response)
+                                  (response/content-type "application/json")))
   (route/not-found "Not Found"))
+
+
+
 
 (def app
   (wrap-defaults app-routes site-defaults))
